@@ -5,15 +5,18 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import ClassVar
-from xml.etree.ElementTree import Element
-from xml.etree.ElementTree import ElementTree
-from xml.etree.ElementTree import parse
+
+from defusedxml.ElementTree import parse
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
+    from xml.etree.ElementTree import Element
+    from xml.etree.ElementTree import ElementTree
 
 
-def _get_project_scene_top_node(project_xml_node: ElementTree[Element[str]]) -> Element:
+def _get_project_scene_top_node(
+    project_xml_node: ElementTree[Element[str] | None],
+) -> Element:
     """Returns the scene top node of the .sboard file."""
     top_node = project_xml_node.find("./scenes/scene[@name='Top']")
     if top_node is None:
@@ -327,7 +330,7 @@ class SBoardLayer(_SBoardNode):
         return SBoardLibraryElement(element_node, cat)
 
     def layer_iter(
-        self, groups: bool = False, recursive: bool = False
+        self, *, groups: bool = False, recursive: bool = False
     ) -> Iterator[SBoardLayer]:
         """Returns an iterator of all the sub layers contained in the layer.
 
@@ -353,7 +356,7 @@ class SBoardLayer(_SBoardNode):
                     yield layer
 
                 if recursive:
-                    yield from layer.layer_iter(groups, recursive)
+                    yield from layer.layer_iter(groups=groups, recursive=recursive)
             else:
                 yield layer
 
@@ -427,7 +430,9 @@ class SBoardPanel(_SBoardNode):
         end = start + self.length
         return start, end
 
-    def layer_iter(self, groups=False, recursive=False) -> Iterator[SBoardLayer]:
+    def layer_iter(
+        self, *, groups: bool = False, recursive: bool = False
+    ) -> Iterator[SBoardLayer]:
         """Returns an iterator of all the root layers in the panel.
 
         Args:
@@ -442,7 +447,7 @@ class SBoardPanel(_SBoardNode):
                     yield layer
 
                 if recursive:
-                    yield from layer.layer_iter(groups, recursive)
+                    yield from layer.layer_iter(groups=groups, recursive=recursive)
 
             else:
                 yield layer
@@ -828,14 +833,14 @@ class SBoardProject:
         """Returns a SBoardProject from the given path."""
         return cls(parse(sboard_path))
 
-    def __init__(self, xml_node: ElementTree[Element[str]]) -> None:
+    def __init__(self, xml_node: ElementTree[Element[str] | None]) -> None:
         """Initialize the project node object."""
         self._xml_node = xml_node
         self._timeline_node = _get_project_scene_top_node(self.xml_node)
 
     @property
-    def xml_node(self) -> ElementTree[Element[str]]:
-        """Returns the xml node of the project."""
+    def xml_node(self) -> ElementTree[Element[str] | None]:
+        """Returns the XML node of the project."""
         return self._xml_node
 
     @property

@@ -20,7 +20,9 @@ classifiers = [
     "Typing :: Typed",
 ]
 requires-python = ">=3.9"
-dependencies = []
+dependencies = [
+    "defusedxml"
+]
 
 [dependency-groups]
 dev = [
