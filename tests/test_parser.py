@@ -7,7 +7,7 @@ import types
 import os
 from unittest import TestCase
 
-import sboardparser
+import tbsbpparser
 
 SAMPLE_DIRECTORY = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                 "samples")
@@ -17,42 +17,42 @@ class SBoardParserTest(TestCase):
 
     def test_empty_project(self):
         test_path = os.path.join(SAMPLE_DIRECTORY, "empty_project.sboard")
-        project = sboardparser.parse(test_path)
+        project = tbsbpparser.parse(test_path)
         self._test_project(project)
 
     def test_01(self):
         test_path = os.path.join(SAMPLE_DIRECTORY, "test_01.sboard")
-        project = sboardparser.parse(test_path)
+        project = tbsbpparser.parse(test_path)
         self._test_project(project)
 
     def test_02(self):
         test_path = os.path.join(SAMPLE_DIRECTORY, "test_02.sboard")
-        project = sboardparser.parse(test_path)
+        project = tbsbpparser.parse(test_path)
         self._test_project(project)
 
     def test_03(self):
         test_path = os.path.join(SAMPLE_DIRECTORY, "test_03.sboard")
-        project = sboardparser.parse(test_path)
+        project = tbsbpparser.parse(test_path)
         self._test_project(project)
 
     def test_04(self):
         test_path = os.path.join(SAMPLE_DIRECTORY, "test_04.sboard")
-        project = sboardparser.parse(test_path)
+        project = tbsbpparser.parse(test_path)
         self._test_project(project)
 
     def test_sequence(self):
         test_path = os.path.join(SAMPLE_DIRECTORY, "sequence.sboard")
-        project = sboardparser.parse(test_path)
+        project = tbsbpparser.parse(test_path)
         self._test_project(project)
 
     def test_3d(self):
         test_path = os.path.join(SAMPLE_DIRECTORY, "test3d.sboard")
-        project = sboardparser.parse(test_path)
+        project = tbsbpparser.parse(test_path)
         self._test_project(project)
 
     def test_track(self):
         test_path = os.path.join(SAMPLE_DIRECTORY, "track.sboard")
-        project = sboardparser.parse(test_path)
+        project = tbsbpparser.parse(test_path)
         self._test_project(project)
 
     def _test_project(self, project):
@@ -62,7 +62,7 @@ class SBoardParserTest(TestCase):
         self.assertIsInstance(scenes_gen, types.GeneratorType)
 
         for s in scenes_gen:
-            self.assertIsInstance(s, sboardparser.parser.SBoardScene)
+            self.assertIsInstance(s, tbsbpparser.parser.SBoardScene)
 
             # Test scene
             self._test_scene(s)
@@ -71,17 +71,17 @@ class SBoardParserTest(TestCase):
         self.assertIsInstance(sequence_gen, types.GeneratorType)
 
         for sq in sequence_gen:
-            self.assertIsInstance(sq, sboardparser.parser.SBoardSequence)
+            self.assertIsInstance(sq, tbsbpparser.parser.SBoardSequence)
             self._test_sequence(sq)
 
         # Test timeline
         self.assertIsInstance(project.timeline,
-                              sboardparser.parser.SBoardTimeline)
+                              tbsbpparser.parser.SBoardTimeline)
         self._test_timeline(project.timeline)
 
         # Test library
         library = project.library
-        self.assertIsInstance(library, sboardparser.parser.SBoardLibrary)
+        self.assertIsInstance(library, tbsbpparser.parser.SBoardLibrary)
         self._test_library(library)
 
         self.assertIsInstance(project.frame_rate, float)
@@ -93,24 +93,24 @@ class SBoardParserTest(TestCase):
         cat_gen = library.categories
         self.assertIsInstance(cat_gen, types.GeneratorType)
         self.assertIsInstance(library.project,
-                              sboardparser.parser.SBoardProject)
+                              tbsbpparser.parser.SBoardProject)
 
         element_gen = library.elements
         self.assertIsInstance(element_gen, types.GeneratorType)
 
         for element in element_gen:
             self.assertIsInstance(element,
-                                  sboardparser.parser.SBoardLibraryElement)
+                                  tbsbpparser.parser.SBoardLibraryElement)
             self._test_element(element)
 
     def _test_sequence(self, sequence):
 
         self.assertIsInstance(sequence.name, str)
         self.assertIsInstance(sequence.project,
-                              sboardparser.parser.SBoardProject)
+                              tbsbpparser.parser.SBoardProject)
 
         for scene in sequence.scenes:
-            self.assertIsInstance(scene, sboardparser.parser.SBoardScene)
+            self.assertIsInstance(scene, tbsbpparser.parser.SBoardScene)
             self._test_scene(scene)
 
     def _test_scene(self, scene):
@@ -135,7 +135,7 @@ class SBoardParserTest(TestCase):
 
         # Test sequence
         self.assertIsInstance(scene.sequence,
-                              (type(None), sboardparser.parser.SBoardSequence))
+                              (type(None), tbsbpparser.parser.SBoardSequence))
 
         # Test panels
         panels_gen = scene.panels
@@ -144,7 +144,7 @@ class SBoardParserTest(TestCase):
         panel_length_sum = 0
 
         for p in panels_gen:
-            self.assertIsInstance(p, sboardparser.parser.SBoardPanel)
+            self.assertIsInstance(p, tbsbpparser.parser.SBoardPanel)
             self._test_panel(p)
 
             # Test scene equality
@@ -162,10 +162,10 @@ class SBoardParserTest(TestCase):
         self.assertIsInstance(panel.uid, str)
 
         # Test scene
-        self.assertIsInstance(panel.scene, sboardparser.parser.SBoardScene)
+        self.assertIsInstance(panel.scene, tbsbpparser.parser.SBoardScene)
 
         # Test project
-        self.assertIsInstance(panel.project, sboardparser.parser.SBoardProject)
+        self.assertIsInstance(panel.project, tbsbpparser.parser.SBoardProject)
 
         # Test frame range
         frame_range = panel.clip_range
@@ -188,13 +188,13 @@ class SBoardParserTest(TestCase):
         self.assertIsInstance(layers_gen, types.GeneratorType)
 
         for layer in layers_gen:
-            self.assertIsInstance(layer, sboardparser.parser.SBoardLayer)
+            self.assertIsInstance(layer, tbsbpparser.parser.SBoardLayer)
             self.assertFalse(layer.is_group())
             self._test_layer(layer)
 
         # Test all layers iter
         for layer in panel.layer_iter(groups=True, recursive=True):
-            self.assertIsInstance(layer, sboardparser.parser.SBoardLayer)
+            self.assertIsInstance(layer, tbsbpparser.parser.SBoardLayer)
 
             if not layer.is_group():
                 self._test_layer_leaf(layer)
@@ -212,7 +212,7 @@ class SBoardParserTest(TestCase):
         current_scene_start = 0
 
         for s in timeline.scenes:
-            self.assertIsInstance(s, sboardparser.parser.SBoardScene)
+            self.assertIsInstance(s, tbsbpparser.parser.SBoardScene)
             self.assertGreaterEqual(s.timeline_range[0], current_scene_start)
             current_scene_start = s.timeline_range[0]
 
@@ -220,7 +220,7 @@ class SBoardParserTest(TestCase):
         current_panel_start = 0
 
         for p in timeline.panels:
-            self.assertIsInstance(p, sboardparser.parser.SBoardPanel)
+            self.assertIsInstance(p, tbsbpparser.parser.SBoardPanel)
             self.assertGreaterEqual(p.timeline_range[0], current_panel_start)
             current_panel_start = p.timeline_range[0]
 
@@ -228,46 +228,46 @@ class SBoardParserTest(TestCase):
         self.assertIsInstance(v_tracks, types.GeneratorType)
 
         for track in v_tracks:
-            self.assertIsInstance(track, sboardparser.parser.SBoardVideoTrack)
+            self.assertIsInstance(track, tbsbpparser.parser.SBoardVideoTrack)
             self._test_video_track(track)
 
         a_tracks = timeline.audio_tracks
         self.assertIsInstance(a_tracks, types.GeneratorType)
 
         for track in a_tracks:
-            self.assertIsInstance(track, sboardparser.parser.SBoardAudioTrack)
+            self.assertIsInstance(track, tbsbpparser.parser.SBoardAudioTrack)
             self._test_audio_track(track)
 
         for transition in timeline.transitions:
-            self.assertIsInstance(transition, sboardparser.parser.SBoardTransition)
+            self.assertIsInstance(transition, tbsbpparser.parser.SBoardTransition)
             self.assertEqual(transition.timeline, timeline)
             self._test_transition(transition)
 
-        self.assertIsInstance(timeline.project, sboardparser.SBoardProject)
+        self.assertIsInstance(timeline.project, tbsbpparser.SBoardProject)
 
     def _test_video_track(self, track):
         self.assertIsInstance(track.uid, str)
         self.assertIsInstance(track.name, str)
         self.assertIsInstance(track.timeline,
-                              sboardparser.parser.SBoardTimeline)
+                              tbsbpparser.parser.SBoardTimeline)
         self.assertIsInstance(track.is_enabled(), bool)
         clips = track.clips
         self.assertIsInstance(clips, types.GeneratorType)
 
         for clip in clips:
-            self.assertIsInstance(clip, sboardparser.parser.SBoardVideoClip)
+            self.assertIsInstance(clip, tbsbpparser.parser.SBoardVideoClip)
             self._test_video_clip(clip)
 
     def _test_audio_track(self, track):
         self.assertIsInstance(track.name, str)
         self.assertIsInstance(track.timeline,
-                              sboardparser.parser.SBoardTimeline)
+                              tbsbpparser.parser.SBoardTimeline)
         self.assertIsInstance(track.is_enabled(), bool)
         clips = track.clips
         self.assertIsInstance(clips, types.GeneratorType)
 
         for clip in clips:
-            self.assertIsInstance(clip, sboardparser.parser.SBoardAudioClip)
+            self.assertIsInstance(clip, tbsbpparser.parser.SBoardAudioClip)
             self._test_audio_clip(clip)
 
     def _test_video_clip(self, clip):
@@ -277,9 +277,9 @@ class SBoardParserTest(TestCase):
         self.assertIsInstance(clip.length, int)
         self.assertIsInstance(clip.path, str)
         self.assertIsInstance(clip.element,
-                              sboardparser.parser.SBoardLibraryElement)
+                              tbsbpparser.parser.SBoardLibraryElement)
         self.assertIsInstance(clip.track,
-                              sboardparser.parser.SBoardVideoTrack)
+                              tbsbpparser.parser.SBoardVideoTrack)
 
     def _test_audio_clip(self, clip):
         self.assertIsInstance(clip.file_name, str)
@@ -288,23 +288,23 @@ class SBoardParserTest(TestCase):
         self.assertIsInstance(clip.length, int)
         self.assertIsInstance(clip.path, str)
         self.assertIsInstance(clip.track,
-                              sboardparser.parser.SBoardAudioTrack)
+                              tbsbpparser.parser.SBoardAudioTrack)
 
     def _test_element(self, element):
 
         self.assertIsInstance(element.category,
-                              sboardparser.parser.SBoardLibraryCategory)
+                              tbsbpparser.parser.SBoardLibraryCategory)
         self.assertIsInstance(element.name, str)
         self.assertIsInstance(element.path, str)
 
     def _test_layer(self, layer):
 
         self.assertIsInstance(layer.name, str)
-        self.assertIsInstance(layer.panel, sboardparser.parser.SBoardPanel)
+        self.assertIsInstance(layer.panel, tbsbpparser.parser.SBoardPanel)
 
         element = layer.element
         self.assertIsInstance(element,
-                              (sboardparser.parser.SBoardLibraryElement,
+                              (tbsbpparser.parser.SBoardLibraryElement,
                                type(None)))
 
         if element:
@@ -325,7 +325,7 @@ class SBoardTrackTest(TestCase):
     def __init__(self, *args, **kwargs):
         super(SBoardTrackTest, self).__init__(*args, **kwargs)
         test_path = os.path.join(SAMPLE_DIRECTORY, "track.sboard")
-        self.project = sboardparser.parse(test_path)
+        self.project = tbsbpparser.parse(test_path)
 
     def test_tracks(self):
 
