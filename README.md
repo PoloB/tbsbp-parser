@@ -1,16 +1,16 @@
-# sboard-parser
+# tbsbp-parser
 Python parser for Toon Boom Storyboard Pro project files.
 
-Storyboard Pro .sboard files are simple xml files.
+Storyboard Pro .sboard files are simple XML files.
 This parser build a hierarchy of objects that represents all the elements in the
 project file.
 
 Usage example:
 
 ```python
-from sboardparser import parse
+import tbsbpparser
 
-project = parse("/path/to/your/sboard/file.sboard")
+project = tbsbpparser.parse("/path/to/your/sboard/file.sboard")
 
 scenes = project.scenes
 

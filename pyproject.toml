@@ -1,0 +1,92 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tbsbp-parser"
+dynamic = ["version"]
+description = "Parser of Toon Boom Story Board Pro sboard project files"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "Paul-Emile Buteau", email = "paulemilebuteau@gmail.com" },
+]
+keywords = ["parser"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "defusedxml"
+]
+
+[dependency-groups]
+dev = [
+    { include-group = "test" },
+    { include-group = "lint" },
+    "snakeviz"
+]
+test = [
+    "pytest",
+    "pytest-cov",
+    "pytest-benchmark",
+]
+lint = [
+    "ty>=0.0.82",
+    "ruff>=0.15.5",
+]
+docs = []
+
+[project.urls]
+Homepage = "https://github.com/PoloB/tbsbp-parser"
+Repository = "https://github.com/PoloB/tbsbp-parser"
+Issues = "https://github.com/PoloB/tbsbp-parser/issues"
+Changelog = "https://github.com/PoloB/tbsbp-parser/releases"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tbsbpparser"]
+
+[tool.pytest.ini_options]
+pythonpath = "src"
+testpaths = "tests/"
+
+[tool.coverage]
+run.omit = ["tests/*"]
+report.exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "@abc.abstractmethod",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 89
+lint.select = ["ALL"]
+lint.ignore = ["COM812", "CPY001"]
+lint.fixable = [
+    "D202", # black lines after docstring in functions
+    "I", # sorting imports
+    "F401", # unused imports
+    "TC001", # first party imports not in type checking block
+    "TC002", # third party imports not in type checking block
+    "TC003", # builtin party imports not in type checking block
+    "TC004", # imports used at runtime but in type checking block
+    "TC005", # empty type checking block
+    "RUF022",
+    "E501",
+]
+lint.isort.force-single-line = true
+lint.pydocstyle.convention = "google"
+format.skip-magic-trailing-comma = true
+src = ["src", "tests"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/test_*.py" = ["S101"]
+"tests/**/test_*.py" = ["S101"]
