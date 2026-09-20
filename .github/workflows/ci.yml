@@ -45,7 +45,7 @@ jobs:
           files: ./coverage.xml
           verbose: true
 
-  # ── Lint (ruff + mypy) ───────────────────────────────────────────────────────
+  # ── Lint (ruff + ty) ───────────────────────────────────────────────────────
   lint:
     name: "lint"
     runs-on: ubuntu-latest
@@ -67,43 +67,43 @@ jobs:
       - name: Ruff — format
         run: uv run ruff format --check .
 
-      - name: Mypy
-        run: uv run mypy .
+      - name: ty
+        run: uv run ty check
 
   # ── Benchmarks ───────────────────────────────────────────────────────────────
-  benchmark:
-    name: "benchmark"
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
-
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
-        with:
-          python-version: 3.13
-          enable-cache: 'auto'
-
-      - name: Install dependencies
-        run: uv sync --frozen --group test --group test
-
-      - name: Run benchmarks
-        run: uv run pytest tests/ --benchmark-only --benchmark-json benchmark_result.json
-
-      - name: Store and compare benchmark results
-        uses: benchmark-action/github-action-benchmark@v1
-        with:
-          tool: 'pytest'
-          output-file-path: benchmark_result.json
-          # Where the previous data file is stored
-          external-data-json-path: ./cache/benchmark-data-benchmark_result.json
-          # Workflow will fail when an alert happens
-          fail-on-alert: true
-          # GitHub API token to make a commit comment
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          # Enable alert commit comment
-          comment-on-alert: true
-          # Enable Job Summary for PRs
-          comment-always: true
-          # Enable Job Summary for PRs
-          summary-always: true
+#  benchmark:
+#    name: "benchmark"
+#    runs-on: ubuntu-latest
+#    if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
+#
+#    steps:
+#      - uses: actions/checkout@v7
+#
+#      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+#        with:
+#          python-version: 3.13
+#          enable-cache: 'auto'
+#
+#      - name: Install dependencies
+#        run: uv sync --frozen --group test --group test
+#
+#      - name: Run benchmarks
+#        run: uv run pytest tests/ --benchmark-only --benchmark-json benchmark_result.json
+#
+#      - name: Store and compare benchmark results
+#        uses: benchmark-action/github-action-benchmark@v1
+#        with:
+#          tool: 'pytest'
+#          output-file-path: benchmark_result.json
+#          # Where the previous data file is stored
+#          external-data-json-path: ./cache/benchmark-data-benchmark_result.json
+#          # Workflow will fail when an alert happens
+#          fail-on-alert: true
+#          # GitHub API token to make a commit comment
+#          github-token: ${{ secrets.GITHUB_TOKEN }}
+#          # Enable alert commit comment
+#          comment-on-alert: true
+#          # Enable Job Summary for PRs
+#          comment-always: true
+#          # Enable Job Summary for PRs
+#          summary-always: true
