@@ -4,14 +4,13 @@ import pathlib
 import types
 
 import pytest
-from tests.conftest import SAMPLE_DIRECTORY
-from tests.conftest import TESTED_FILES
 
-import tbsbpparser
+from tbsbpparser import parse
 from tbsbpparser.parser import SBoardAudioClip
 from tbsbpparser.parser import SBoardAudioTrack
 from tbsbpparser.parser import SBoardLayer
 from tbsbpparser.parser import SBoardLibrary
+from tbsbpparser.parser import SBoardLibraryCategory
 from tbsbpparser.parser import SBoardLibraryElement
 from tbsbpparser.parser import SBoardPanel
 from tbsbpparser.parser import SBoardProject
@@ -22,6 +21,9 @@ from tbsbpparser.parser import SBoardTransition
 from tbsbpparser.parser import SBoardVideoClip
 from tbsbpparser.parser import SBoardVideoTrack
 
+from .conftest import SAMPLE_DIRECTORY
+from .conftest import TESTED_FILES
+
 
 def _test_project(project: SBoardProject) -> None:
     # Try to get the scenes from project
@@ -29,7 +31,7 @@ def _test_project(project: SBoardProject) -> None:
     assert isinstance(scenes_gen, types.GeneratorType)
 
     for s in scenes_gen:
-        assert isinstance(s, tbsbpparser.parser.SBoardScene)
+        assert isinstance(s, SBoardScene)
 
         # Test scene
         _test_scene(s)
@@ -38,16 +40,16 @@ def _test_project(project: SBoardProject) -> None:
     assert isinstance(sequence_gen, types.GeneratorType)
 
     for sq in sequence_gen:
-        assert isinstance(sq, tbsbpparser.parser.SBoardSequence)
+        assert isinstance(sq, SBoardSequence)
         _test_sequence(sq)
 
     # Test timeline
-    assert isinstance(project.timeline, tbsbpparser.parser.SBoardTimeline)
+    assert isinstance(project.timeline, SBoardTimeline)
     _test_timeline(project.timeline)
 
     # Test library
     library = project.library
-    assert isinstance(library, tbsbpparser.parser.SBoardLibrary)
+    assert isinstance(library, SBoardLibrary)
     _test_library(library)
 
     assert isinstance(project.frame_rate, float)
@@ -59,23 +61,23 @@ def _test_library(library: SBoardLibrary) -> None:
     # Test categories
     cat_gen = library.categories
     assert isinstance(cat_gen, types.GeneratorType)
-    assert isinstance(library.project, tbsbpparser.parser.SBoardProject)
+    assert isinstance(library.project, SBoardProject)
 
     element_gen = library.elements
     assert isinstance(element_gen, types.GeneratorType)
 
     for element in element_gen:
-        assert isinstance(element, tbsbpparser.parser.SBoardLibraryElement)
+        assert isinstance(element, SBoardLibraryElement)
         _test_element(element)
 
 
 def _test_sequence(sequence: SBoardSequence) -> None:
 
     assert isinstance(sequence.name, str)
-    assert isinstance(sequence.project, tbsbpparser.parser.SBoardProject)
+    assert isinstance(sequence.project, SBoardProject)
 
     for scene in sequence.scenes:
-        assert isinstance(scene, tbsbpparser.parser.SBoardScene)
+        assert isinstance(scene, SBoardScene)
         _test_scene(scene)
 
 
@@ -100,7 +102,7 @@ def _test_scene(scene: SBoardScene) -> None:
     assert isinstance(scene.length, int)
 
     # Test sequence
-    assert isinstance(scene.sequence, (type(None), tbsbpparser.parser.SBoardSequence))
+    assert isinstance(scene.sequence, (type(None), SBoardSequence))
 
     # Test panels
     panels_gen = scene.panels
@@ -109,7 +111,7 @@ def _test_scene(scene: SBoardScene) -> None:
     panel_length_sum = 0
 
     for p in panels_gen:
-        assert isinstance(p, tbsbpparser.parser.SBoardPanel)
+        assert isinstance(p, SBoardPanel)
         _test_panel(p)
 
         # Test scene equality
@@ -128,10 +130,10 @@ def _test_panel(panel: SBoardPanel) -> None:
     assert isinstance(panel.uid, str)
 
     # Test scene
-    assert isinstance(panel.scene, tbsbpparser.parser.SBoardScene)
+    assert isinstance(panel.scene, SBoardScene)
 
     # Test project
-    assert isinstance(panel.project, tbsbpparser.parser.SBoardProject)
+    assert isinstance(panel.project, SBoardProject)
 
     # Test frame range
     frame_range = panel.clip_range
@@ -154,13 +156,13 @@ def _test_panel(panel: SBoardPanel) -> None:
     assert isinstance(layers_gen, types.GeneratorType)
 
     for layer in layers_gen:
-        assert isinstance(layer, tbsbpparser.parser.SBoardLayer)
+        assert isinstance(layer, SBoardLayer)
         assert layer.is_group() is False
         _test_layer(layer)
 
     # Test all layers iter
     for layer in panel.layer_iter(groups=True, recursive=True):
-        assert isinstance(layer, tbsbpparser.parser.SBoardLayer)
+        assert isinstance(layer, SBoardLayer)
 
         if not layer.is_group():
             _test_layer_leaf(layer)
@@ -179,7 +181,7 @@ def _test_timeline(timeline: SBoardTimeline) -> None:
     current_scene_start = 0
 
     for s in timeline.scenes:
-        assert isinstance(s, tbsbpparser.parser.SBoardScene)
+        assert isinstance(s, SBoardScene)
         assert s.timeline_range[0] >= current_scene_start
         current_scene_start = s.timeline_range[0]
 
@@ -187,7 +189,7 @@ def _test_timeline(timeline: SBoardTimeline) -> None:
     current_panel_start = 0
 
     for p in timeline.panels:
-        assert isinstance(p, tbsbpparser.parser.SBoardPanel)
+        assert isinstance(p, SBoardPanel)
         assert p.timeline_range[0] >= current_panel_start
         current_panel_start = p.timeline_range[0]
 
@@ -195,46 +197,46 @@ def _test_timeline(timeline: SBoardTimeline) -> None:
     assert isinstance(v_tracks, types.GeneratorType)
 
     for track in v_tracks:
-        assert isinstance(track, tbsbpparser.parser.SBoardVideoTrack)
+        assert isinstance(track, SBoardVideoTrack)
         _test_video_track(track)
 
     a_tracks = timeline.audio_tracks
     assert isinstance(a_tracks, types.GeneratorType)
 
     for track in a_tracks:
-        assert isinstance(track, tbsbpparser.parser.SBoardAudioTrack)
+        assert isinstance(track, SBoardAudioTrack)
         _test_audio_track(track)
 
     for transition in timeline.transitions:
-        assert isinstance(transition, tbsbpparser.parser.SBoardTransition)
+        assert isinstance(transition, SBoardTransition)
         assert transition.timeline == timeline
         _test_transition(transition)
 
-    assert isinstance(timeline.project, tbsbpparser.SBoardProject)
+    assert isinstance(timeline.project, SBoardProject)
 
 
 def _test_video_track(track: SBoardVideoTrack) -> None:
     assert isinstance(track.uid, str)
     assert isinstance(track.name, str)
-    assert isinstance(track.timeline, tbsbpparser.parser.SBoardTimeline)
+    assert isinstance(track.timeline, SBoardTimeline)
     assert isinstance(track.is_enabled(), bool)
     clips = track.clips
     assert isinstance(clips, types.GeneratorType)
 
     for clip in clips:
-        assert isinstance(clip, tbsbpparser.parser.SBoardVideoClip)
+        assert isinstance(clip, SBoardVideoClip)
         _test_video_clip(clip)
 
 
 def _test_audio_track(track: SBoardAudioTrack) -> None:
     assert isinstance(track.name, str)
-    assert isinstance(track.timeline, tbsbpparser.parser.SBoardTimeline)
+    assert isinstance(track.timeline, SBoardTimeline)
     assert isinstance(track.is_enabled(), bool)
     clips = track.clips
     assert isinstance(clips, types.GeneratorType)
 
     for clip in clips:
-        assert isinstance(clip, tbsbpparser.parser.SBoardAudioClip)
+        assert isinstance(clip, SBoardAudioClip)
         _test_audio_clip(clip)
 
 
@@ -244,8 +246,8 @@ def _test_video_clip(clip: SBoardVideoClip) -> None:
     assert isinstance(clip.clip_range, tuple)
     assert isinstance(clip.length, int)
     assert isinstance(clip.path, str)
-    assert isinstance(clip.element, tbsbpparser.parser.SBoardLibraryElement)
-    assert isinstance(clip.track, tbsbpparser.parser.SBoardVideoTrack)
+    assert isinstance(clip.element, SBoardLibraryElement)
+    assert isinstance(clip.track, SBoardVideoTrack)
 
 
 def _test_audio_clip(clip: SBoardAudioClip) -> None:
@@ -254,12 +256,12 @@ def _test_audio_clip(clip: SBoardAudioClip) -> None:
     assert isinstance(clip.clip_range, tuple)
     assert isinstance(clip.length, int)
     assert isinstance(clip.path, str)
-    assert isinstance(clip.track, tbsbpparser.parser.SBoardAudioTrack)
+    assert isinstance(clip.track, SBoardAudioTrack)
 
 
 def _test_element(element: SBoardLibraryElement) -> None:
 
-    assert isinstance(element.category, tbsbpparser.parser.SBoardLibraryCategory)
+    assert isinstance(element.category, SBoardLibraryCategory)
     assert isinstance(element.name, str)
     assert isinstance(element.path, str)
 
@@ -267,10 +269,10 @@ def _test_element(element: SBoardLibraryElement) -> None:
 def _test_layer(layer: SBoardLayer) -> None:
 
     assert isinstance(layer.name, str)
-    assert isinstance(layer.panel, tbsbpparser.parser.SBoardPanel)
+    assert isinstance(layer.panel, SBoardPanel)
 
     element = layer.element
-    assert isinstance(element, (tbsbpparser.parser.SBoardLibraryElement, type(None)))
+    assert isinstance(element, (SBoardLibraryElement, type(None)))
 
     if element:
         _test_element(element)
@@ -293,14 +295,14 @@ def _test_transition(transition: SBoardTransition) -> None:
 )
 def test_project(sboard_path: pathlib.Path) -> None:
     """Test the given projects."""
-    project = tbsbpparser.parse(str(sboard_path))
+    project = parse(str(sboard_path))
     _test_project(project)
 
 
 def test_tracks() -> None:  # noqa: PLR0915
     """Test the content of the tracks."""
     test_path = str(SAMPLE_DIRECTORY / "track.sboard")
-    project = tbsbpparser.parse(test_path)
+    project = parse(test_path)
     timeline = project.timeline
 
     audio_tracks = list(timeline.audio_tracks)
